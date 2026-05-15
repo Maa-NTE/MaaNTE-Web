@@ -6,7 +6,7 @@ import { genNavigationComponents } from './navigation/genNavigationComponents.ts
 const navigationComponents = genNavigationComponents()
 
 export default defineUserConfig({
-  base: '/',
+  base: '/MaaNTE-Web/',
   lang: 'zh-CN',
   title: 'MaaNTE 文档站',
   description: 'MaaNTE | MAA 异环小助手',
@@ -19,7 +19,7 @@ export default defineUserConfig({
   shouldPrefetch: false,
 
   theme: plumeTheme({
-    hostname: 'https://maante.github.io',
+    hostname: 'https://maa-nte.github.io/MaaNTE-Web',
 
     docsRepo: '1bananachicken/MaaNTE',
     docsDir: '/docs',
