@@ -15,6 +15,9 @@
     "vp-update": "pnpm dlx vp-update"
   },
   "license": "AGPL-3.0",
+  "overrides": {
+    "qs": "6.15.2"
+  },
   "devDependencies": {
     "@vue/runtime-core": "^3.5.22",
     "@vuepress/bundler-vite": "2.0.0-rc.26",
