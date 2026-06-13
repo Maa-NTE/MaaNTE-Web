@@ -9,4 +9,4 @@ index: true
 
 - [自动弹琴](AutoPiano.md)：自动演奏钢琴，支持midi谱面。
 - [抚摸](Touch.md)：一直摸小动物
-- [喷泉打卡](FountainCheckin.md)：去许愿池许个愿吧
+- [喷泉打卡](/zh_cn/introduction/FountainCheckin.md)：去许愿池许个愿吧

@@ -44,11 +44,11 @@ config:
           icon: fa7-solid:external-link-alt
           type: primary
           children:
-            - text: Discord
-              link: https://discord.com/invite/e6mPMRYQpR
-              type: secondary
             - text: QQ グループ
               link: /ja_jp/qq-group/
+              type: secondary
+            - text: Discord
+              link: https://discord.com/invite/e6mPMRYQpR
               type: secondary
         - text: もっと見る
           icon: heroicons:ellipsis-horizontal-circle-16-solid
@@ -89,27 +89,35 @@ config:
       - title: 自動釣り
         details: 自動で大物を釣り上げ、自動売却・餌の自動購入・無限ループに対応
         icon: icon-park-outline:fishing
+        link: introduction/HethereauHobbies/Fish.md
       - title: 自動回避と反撃
         details: 音声認識によるリアルタイム回避システム。ゲームの効果音を監視し、回避と反撃を自動発動。戦闘をより快適に
         icon: fa7-solid:bolt
+        link: introduction\RealTimeAssist\SoundDodge.md
       - title: リアルタイムアシスト
         details: 自動拾得、ストーリー自動スキップ、テレポート自動クリック。面倒な操作を減らし、ゲーム体験をよりスムーズに
         icon: fa7-solid:clock
+        link: introduction/RealTimeAssist/RealTime.md
       - title: ピンククロー強奪事件
         details: 「ピンククロー強奪事件」を自動周回し、報酬を簡単に獲得。両手を解放します
         icon: streamline-plump:pet-paw-solid
+        link: introduction\HethereauHobbies\PinkPawHeist.md
       - title: 報酬受け取り
         details: デイリー報酬を自動で受け取り
         icon: fa7-solid:gift
+        link: introduction\Daily\ClaimRewards.md
       - title: 自動コーヒー作成
         details: 「店長スペシャル」を自動化し、コーヒー作成から都市スタミナのフォンス farming まで全自動
         icon: mdi:coffee-maker-check-outline
+        link: introduction\HethereauHobbies\MakeCoffee.md
       - title: 超強音
         details: 音ゲー「超強音」を自動演奏。自動選曲、連続演奏、フレームレート調整に対応。音ゲー報酬を簡単に獲得
         icon: fa7-solid:music
+        link: introduction\HethereauHobbies\Rhythm.md
       - title: その他の機能
         details: 自動演奏、クイック拾得、報酬受け取り、お金の引き出し…さらなる自動化機能を続々追加中
         icon: heroicons:ellipsis-horizontal-circle-16-solid
+        link: /ja_jp/introduction/
   - type: HomeIntro
     items:
       - title: オープンソース駆動、充実のドキュメント

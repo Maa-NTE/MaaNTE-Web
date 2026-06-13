@@ -74,7 +74,7 @@ MaaNTE 是《異環（Neverness to Everness）》的自動化工具集，專注�
 
 詳細安裝與設定說明請查看上游倉庫的 [README](https://github.com/1bananachicken/MaaNTE)。
 
-遇到問題？請參考 [問題排查](/zh_tw/問題排查.html) 和 [常見問題](/zh_tw/develop/faq.html)。
+遇到問題？請參考 [問題排查](trouble_shooting-zh_tw.md)。
 
 ### 為文檔貢獻內容
 

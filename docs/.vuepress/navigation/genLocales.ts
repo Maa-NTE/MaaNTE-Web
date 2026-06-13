@@ -6,14 +6,13 @@ import { genNavigationComponents } from './genNavigationComponents.ts'
 
 export function genSiteLocales(): SiteLocaleConfig {
   const siteLocales: SiteLocaleConfig = {}
-  // 为根路径 / 添加默认中文 locale，确保首页也能显示语言切换按钮
-  siteLocales['/'] = {
-    lang: 'zh-CN',
-    title: 'MaaNTE 文档站',
-    description: 'MaaNTE | MAA 异环小助手 — 由 MaaFramework 强力驱动的《异环》自动化辅助工具',
-  }
+
   for (const locale of locales) {
-    siteLocales[`/${locale.name}/`] = {
+    // 💡 方案 B 關鍵修改點 1：
+    // 如果是 zh_cn，將它的站點路由掛載到根路徑 '/'
+    const localePath = locale.name === 'zh_cn' ? '/' : `/${locale.name}/`
+    
+    siteLocales[localePath] = {
       lang: locale.htmlLang,
       title: locale.siteTitle,
       description: locale.siteDescription,
@@ -24,18 +23,17 @@ export function genSiteLocales(): SiteLocaleConfig {
 
 export function genThemeLocales(): LocaleConfig<ThemeLocaleData> {
   const themeLocales: LocaleConfig<ThemeLocaleData> = {}
+  
   for (const locale of locales) {
     const navigationComponents = genNavigationComponents(locale)
     const footer: Record<string, { message: string; copyright: string }> = {
       zh_cn: {
         copyright: 'MaaNTE 为开源项目，以 <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">AGPL-3.0</a> 协议发布。',
         message: '本软件与《异环》开发商及发行商无关。',
-        
       },
       zh_tw: {
         copyright: 'MaaNTE 為專案開源，以 <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">AGPL-3.0</a> 協議發布。 ',
         message: '本軟體與《異環》的開發商及發行商無任何關聯。 ',
-        
       },
       en_us: {
         copyright: 'MaaNTE is an open source project, released under the <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">AGPL-3.0</a> license.',
@@ -47,17 +45,22 @@ export function genThemeLocales(): LocaleConfig<ThemeLocaleData> {
       },
     }
 
-    themeLocales[`/${locale.name}/`] = {
-      home: `/${locale.name}/`,
+    // 💡 方案 B 關鍵修改點 2：
+    // 站點路由路徑：zh_cn 對應 '/'，其他對應 '/語系/'
+    const localePath = locale.name === 'zh_cn' ? '/' : `/${locale.name}/`
+
+    themeLocales[localePath] = {
+      // 💡 方案 B 核心：雖然路由在根目錄 '/'，但主頁（home）與文件導航依然指向 '/zh_cn/'
+      // 這樣 VuePress 就會去讀取 docs/zh_cn/README.md 作為首頁，而不需要搬移任何文件
+      home: locale.name === 'zh_cn' ? '/zh_cn/' : `/${locale.name}/`,
       navbar: navigationComponents.navbar,
       collections: navigationComponents.collections,
       footer: footer[locale.name],
     }
   }
-  // 为根路径 / 添加中文 locale，使首页导航栏能显示语言切换按钮
-  themeLocales['/'] = {
-    ...themeLocales['/zh_cn/'],
-    home: '/',
-  }
+
+  // 💡 關鍵修改點 3：
+  // 徹底刪除原本在末尾單獨定義 themeLocales['/'] 的重複賦值邏輯
+
   return themeLocales
 }
