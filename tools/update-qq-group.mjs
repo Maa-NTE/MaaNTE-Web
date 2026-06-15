@@ -2,7 +2,7 @@ import { mkdir, rename, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const GROUP_IDS = ['1103323319', '1101147419', '1075143235', '713114598', '1106448578', '423431800']
+const GROUP_IDS = ['1103323319', '1101147419', '1075143235', '713114598', '1106448578', '423431800', '836136969']
 const API_SOURCES = [
   {
     name: 'primary API',
