@@ -24,7 +24,7 @@ config:
       actions:
         - text: 快速开始
           icon: mdi:file-document-outline
-          link: intro.md
+          link: userdocs/intro.md
           type: primary
         - text: 在线地图
           icon: fa7-solid:map-location-dot
@@ -105,6 +105,7 @@ config:
       - title: 自动闪避与反击
         details: 基于音频识别的实时闪避系统。监听游戏音效，自动触发闪避和反击操作，让战斗更加从容
         icon: fa7-solid:bolt
+        link: introduction/RealTimeAssist/SoundDodge.md
       - title: 实时辅助
         details: 自动拾取、自动跳过剧情、自动点击传送，减少繁琐操作，让游戏体验更加流畅自然
         icon: fa7-solid:clock
@@ -112,15 +113,19 @@ config:
       - title: 粉爪大劫案
         details: 自动刷取「粉爪大劫案」，轻松获取奖励，解放你的双手
         icon: streamline-plump:pet-paw-solid
+        link: introduction/HethereauHobbies/PinkPawHeist.md
       - title: 奖励领取
         details: 自动领取每日奖励
         icon: fa7-solid:gift
+        link: introduction/Daily/ClaimRewards.md
       - title: 自动做咖啡
         details: 进行「店长特供」玩法，自动制作咖啡，全自动完成都市体力刷取方斯
         icon: mdi:coffee-maker-check-outline
+        link: introduction/HethereauHobbies/MakeCoffee.md
       - title: 超强音
         details: 自动演奏音游「超强音」，支持自动选曲、连续演奏和帧率调节。轻松获取音游奖励
         icon: fa7-solid:music
+        link: introduction/HethereauHobbies/Rhythm.md
       - title: 更多功能
         details: 自动弹琴、快速拾取、领取奖励、取钱……更多自动化功能持续更新中
         icon: heroicons:ellipsis-horizontal-circle-16-solid
