@@ -126,7 +126,8 @@ export default defineUserConfig({
         align: 'left',
         maxContent: false, // 表格宽度占据整行
         copy: false, // true | 'all' | 'html' | 'md'
-      }
+      },
+      bilibili: true // 哔哩哔哩视频支持
     }
   }),
 })
