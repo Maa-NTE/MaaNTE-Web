@@ -3,12 +3,18 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const GROUP_IDS = ['1103323319', '1101147419', '1075143235', '713114598', '1106448578', '423431800', '836136969']
+const DEFAULT_PRIMARY_REQUEST_INTERVAL_MS = 21_000
+const rawPrimaryRequestInterval = Number(process.env.QQ_GROUP_INFO_PRIMARY_INTERVAL_MS)
+const PRIMARY_REQUEST_INTERVAL_MS = Number.isFinite(rawPrimaryRequestInterval)
+  ? rawPrimaryRequestInterval
+  : DEFAULT_PRIMARY_REQUEST_INTERVAL_MS
 const API_SOURCES = [
   {
     name: 'primary API',
     baseUrl: process.env.QQ_GROUP_INFO_API ?? 'https://www.tmini.net/api/group?type=',
     queryParam: 'qq',
     ckey: process.env.QQ_GROUP_INFO_CKEY ?? '',
+    minIntervalMs: PRIMARY_REQUEST_INTERVAL_MS,
     headers: { 'content-type': 'application/none' },
     unwrap: unwrapPrimaryResponse,
   },
@@ -24,6 +30,7 @@ const rawMemberLimit = Number(process.env.QQ_GROUP_MEMBER_LIMIT)
 const MEMBER_LIMIT = Number.isFinite(rawMemberLimit) ? rawMemberLimit : DEFAULT_MEMBER_LIMIT
 const REQUEST_DELAY_MS = 350
 const MAX_RETRY_COUNT = 2
+const sourceNextRequestAt = new WeakMap()
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const outputPath = process.env.QQ_GROUP_OUTPUT
@@ -53,12 +60,23 @@ async function fetchGroupFromSource(groupId, source) {
   }
 
   for (let retryCount = 0; retryCount <= MAX_RETRY_COUNT; retryCount += 1) {
+    await waitForSourceRateLimit(source)
+
     const response = await fetch(url, {
       headers: { accept: 'application/json', ...source.headers },
     })
 
     if (response.ok) {
-      return normalizeGroup(groupId, source.unwrap(await response.json()))
+      try {
+        return normalizeGroup(groupId, source.unwrap(await response.json()))
+      } catch (error) {
+        if (!isRateLimitError(error) || retryCount === MAX_RETRY_COUNT) {
+          throw error
+        }
+
+        await sleep(getRetryDelayMs(source, retryCount))
+        continue
+      }
     }
 
     if (response.status !== 429 || retryCount === MAX_RETRY_COUNT) {
@@ -72,6 +90,10 @@ async function fetchGroupFromSource(groupId, source) {
 }
 
 function unwrapPrimaryResponse(response) {
+  if (response?.code === 219) {
+    throw new RateLimitError(`API rate limited: ${response.msg ?? 'too many requests'}`)
+  }
+
   if (response?.code !== 200 || !response.data) {
     throw new Error(`API error: ${response?.msg ?? 'invalid response'}`)
   }
@@ -158,4 +180,29 @@ function isJoinable(group) {
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+async function waitForSourceRateLimit(source) {
+  const minIntervalMs = source.minIntervalMs ?? 0
+  if (minIntervalMs <= 0) return
+
+  const now = Date.now()
+  const nextRequestAt = sourceNextRequestAt.get(source) ?? 0
+  if (now < nextRequestAt) {
+    await sleep(nextRequestAt - now)
+  }
+
+  sourceNextRequestAt.set(source, Date.now() + minIntervalMs)
+}
+
+function getRetryDelayMs(source, retryCount) {
+  return Math.max(source.minIntervalMs ?? 0, REQUEST_DELAY_MS * (retryCount + 2))
+}
+
+function isRateLimitError(error) {
+  return error instanceof RateLimitError
+}
+
+class RateLimitError extends Error {
+  name = 'RateLimitError'
 }
