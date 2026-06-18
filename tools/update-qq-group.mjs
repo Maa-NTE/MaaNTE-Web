@@ -10,19 +10,21 @@ const PRIMARY_REQUEST_INTERVAL_MS = Number.isFinite(rawPrimaryRequestInterval)
   : DEFAULT_PRIMARY_REQUEST_INTERVAL_MS
 const API_SOURCES = [
   {
-    name: 'primary API',
-    baseUrl: process.env.QQ_GROUP_INFO_API ?? 'https://www.tmini.net/api/group?type=',
-    queryParam: 'qq',
-    ckey: process.env.QQ_GROUP_INFO_CKEY ?? '',
+    name: 'self-hosted API',
+    baseUrl: process.env.QQ_GROUP_INFO_API ?? 'http://api.maante.org/apidata',
+    queryParam: 'id',
+    ckey: process.env.QQ_API_KEY ?? '',
+    keyParam: 'key',
     minIntervalMs: PRIMARY_REQUEST_INTERVAL_MS,
-    headers: { 'content-type': 'application/none' },
     unwrap: unwrapPrimaryResponse,
   },
   {
     name: 'fallback API',
-    baseUrl: process.env.QQ_GROUP_INFO_FALLBACK_API ?? 'https://uapis.cn/api/v1/social/qq/groupinfo',
-    queryParam: 'group_id',
-    unwrap: (data) => data,
+    baseUrl: process.env.QQ_GROUP_INFO_FALLBACK_API ?? 'https://www.tmini.net/api/group?type=',
+    queryParam: 'qq',
+    ckey: process.env.QQ_API_KEY ?? '',
+    keyParam: 'ckey',
+    unwrap: unwrapPrimaryResponse,
   },
 ]
 const DEFAULT_MEMBER_LIMIT = 2000
@@ -55,8 +57,8 @@ async function fetchGroup(groupId) {
 async function fetchGroupFromSource(groupId, source) {
   const url = new URL(source.baseUrl)
   url.searchParams.set(source.queryParam, groupId)
-  if ('ckey' in source) {
-    url.searchParams.set('ckey', source.ckey)
+  if ('ckey' in source && source.ckey) {
+    url.searchParams.set(source.keyParam ?? 'ckey', source.ckey)
   }
 
   for (let retryCount = 0; retryCount <= MAX_RETRY_COUNT; retryCount += 1) {
