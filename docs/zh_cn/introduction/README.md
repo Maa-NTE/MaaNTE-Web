@@ -1,7 +1,7 @@
 ---
 title: 功能介绍
 dir:
-  order: 1
+  order: 2
 index: true
 ---
 
