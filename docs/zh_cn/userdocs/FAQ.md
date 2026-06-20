@@ -1,7 +1,6 @@
 ---
 title: 常见问题
-dir:
-  order: 2
+order: 2
 ---
 
 该部分主要提供 MaaNTE 相关问题的解答，使用过程中遇到问题请按[问题排查手册](trouble_shooting.md)排查

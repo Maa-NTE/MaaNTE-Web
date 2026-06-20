@@ -1,7 +1,6 @@
 ---
 title: 问题排查手册
-dir:
-  order: 3
+order: 3
 ---
 
 [[TOC]]

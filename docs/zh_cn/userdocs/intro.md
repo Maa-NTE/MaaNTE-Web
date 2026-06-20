@@ -1,7 +1,6 @@
 ---
 title: 快速开始
-dir:
-  order: 1
+order: 1
 ---
 
 ::: info 注意
