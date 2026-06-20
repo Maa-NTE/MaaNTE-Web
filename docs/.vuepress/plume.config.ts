@@ -2,7 +2,7 @@ import { defineThemeConfig } from 'vuepress-theme-plume'
 import { genThemeLocales } from './navigation/genLocales.ts'
 
 export default defineThemeConfig({
-  home: '/',
+  home: '/zh_cn/',
   logo: 'images/logo_32x32.png',
 
   appearance: true,
