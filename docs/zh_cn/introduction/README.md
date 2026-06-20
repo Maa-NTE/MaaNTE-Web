@@ -58,8 +58,8 @@ MaaNTE 是面向《异环（Neverness to Everness）》的自动化工具集，�
 | 任务 | 描述 |
 | --- | --- |
 | [自动弹琴](others/AutoPiano.md) | 自动演奏钢琴，支持midi谱面。 |
-| [抚摸](others/Touch) | 一直摸小动物 |
-| [喷泉打卡](FountainCheckin.md) | 去许愿池许个愿吧 |
+| [抚摸](others/Touch.md) | 一直摸小动物 |
+| [喷泉打卡](others/FountainCheckin.md) | 去许愿池许个愿吧 |
 
 ## 数据收集
 
