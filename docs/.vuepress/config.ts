@@ -5,11 +5,13 @@ import { seoPlugin } from '@vuepress/plugin-seo'
 import { sitemapPlugin } from '@vuepress/plugin-sitemap'
 import { genSiteLocales } from './navigation/genLocales.ts'
 import breadcrumbFix from './plugins/breadcrumb-fix.ts'
+import redirectRoot from './plugins/redirect-root.ts'
 
 const upstreamDocsBranch = process.env.MAANTE_UPSTREAM_DOCS_BRANCH ?? 'dev'
 
 export default defineUserConfig({
   plugins: [
+    redirectRoot,
     breadcrumbFix,
     seoPlugin({
       hostname: 'https://maante.org',

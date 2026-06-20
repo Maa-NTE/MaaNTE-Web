@@ -7,12 +7,16 @@ import { genNavigationComponents } from './genNavigationComponents.ts'
 export function genSiteLocales(): SiteLocaleConfig {
   const siteLocales: SiteLocaleConfig = {}
 
+  // 根路径作为回退 locale（404、非语言页面等场景），最长前缀匹配
+  // 保证 /zh_cn/xxx 优先匹配 /zh_cn/ 而非 /
+  siteLocales['/'] = {
+    lang: 'zh-CN',
+    title: 'MaaNTE 文档站',
+    description: 'MaaNTE | MAA 异环小助手 — 由 MaaFramework 强力驱动的《异环》自动化辅助工具',
+  }
+
   for (const locale of locales) {
-    // 💡 方案 B 關鍵修改點 1：
-    // 如果是 zh_cn，將它的站點路由掛載到根路徑 '/'
-    const localePath = locale.name === 'zh_cn' ? '/' : `/${locale.name}/`
-    
-    siteLocales[localePath] = {
+    siteLocales[`/${locale.name}/`] = {
       lang: locale.htmlLang,
       title: locale.siteTitle,
       description: locale.siteDescription,
@@ -23,7 +27,7 @@ export function genSiteLocales(): SiteLocaleConfig {
 
 export function genThemeLocales(): LocaleConfig<ThemeLocaleData> {
   const themeLocales: LocaleConfig<ThemeLocaleData> = {}
-  
+
   for (const locale of locales) {
     const navigationComponents = genNavigationComponents(locale)
     const footer: Record<string, { message: string; copyright: string }> = {
@@ -45,22 +49,25 @@ export function genThemeLocales(): LocaleConfig<ThemeLocaleData> {
       },
     }
 
-    // 💡 方案 B 關鍵修改點 2：
-    // 站點路由路徑：zh_cn 對應 '/'，其他對應 '/語系/'
-    const localePath = locale.name === 'zh_cn' ? '/' : `/${locale.name}/`
+    const localePath = `/${locale.name}/`
 
     themeLocales[localePath] = {
-      // 💡 方案 B 核心：雖然路由在根目錄 '/'，但主頁（home）與文件導航依然指向 '/zh_cn/'
-      // 這樣 VuePress 就會去讀取 docs/zh_cn/README.md 作為首頁，而不需要搬移任何文件
-      home: locale.name === 'zh_cn' ? '/zh_cn/' : `/${locale.name}/`,
+      home: `/${locale.name}/`,
       navbar: navigationComponents.navbar,
       collections: navigationComponents.collections,
       footer: footer[locale.name],
     }
-  }
 
-  // 💡 關鍵修改點 3：
-  // 徹底刪除原本在末尾單獨定義 themeLocales['/'] 的重複賦值邏輯
+    // 根路径复用 zh_cn 的导航与集合（供 404 等回退页面使用）
+    if (locale.name === 'zh_cn') {
+      themeLocales['/'] = {
+        home: '/zh_cn/',
+        navbar: navigationComponents.navbar,
+        collections: navigationComponents.collections,
+        footer: footer.zh_cn,
+      }
+    }
+  }
 
   return themeLocales
 }
