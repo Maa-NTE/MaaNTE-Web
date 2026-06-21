@@ -5,8 +5,7 @@ head:
   - - meta
     - name: keywords
       content: MaaNTE,快速开始,下载,安装,配置,异环,自动化,教程
-dir:
-  order: 1
+order: 1
 ---
 
 ::: info 注意

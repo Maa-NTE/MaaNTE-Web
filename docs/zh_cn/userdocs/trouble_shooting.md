@@ -5,8 +5,7 @@ head:
   - - meta
     - name: keywords
       content: MaaNTE,问题排查,报错,无法启动,WebView2,模拟器,截图,故障排除
-dir:
-  order: 3
+order: 3
 ---
 
 [[TOC]]
