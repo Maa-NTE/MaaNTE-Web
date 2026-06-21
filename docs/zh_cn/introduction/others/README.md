@@ -6,7 +6,7 @@ head:
     - name: keywords
       content: 异环,自动弹琴,自动抚摸,MIDI,娱乐,MaaNTE
 dir:
-  order: 5
+  order: 6
 index: true
 ---
 
