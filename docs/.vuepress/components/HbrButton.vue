@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, nextTick, onUnmounted } from 'vue'
 import { VPButton } from 'vuepress-theme-plume/client'
 
 interface ChildAction {
@@ -38,12 +38,86 @@ function resolveTheme(t?: 'brand' | 'alt' | 'sponsor', type?: 'primary' | 'secon
 }
 
 const resolvedTheme = computed(() => resolveTheme(props.theme, props.type))
+
+const rootRef = ref<HTMLElement>()
+const subRef = ref<HTMLElement>()
+const subStyle = ref<Record<string, string>>({})
+const anchorClass = ref('')
+
+let cleanupScroll: (() => void) | null = null
+
+function positionSubMenu() {
+  const root = rootRef.value
+  const sub = subRef.value
+  if (!root || !sub) return
+
+  const btn = root.getBoundingClientRect()
+  const subRect = sub.getBoundingClientRect()
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+  const GAP = 8
+  const MARGIN = 8
+
+  let left = btn.left + btn.width / 2 - subRect.width / 2
+  left = Math.max(MARGIN, Math.min(left, vw - subRect.width - MARGIN))
+
+  const aboveTop = btn.top - subRect.height - GAP
+  const belowTop = btn.bottom + GAP
+
+  if (aboveTop >= MARGIN) {
+    anchorClass.value = 'sub-above'
+    subStyle.value = {
+      left: `${left - btn.left}px`,
+      bottom: `${btn.height + GAP}px`,
+      top: 'auto',
+      transform: 'none',
+    }
+  } else {
+    anchorClass.value = 'sub-below'
+    subStyle.value = {
+      left: `${left - btn.left}px`,
+      top: `${btn.height + GAP}px`,
+      bottom: 'auto',
+      transform: 'none',
+    }
+  }
+}
+
+function onShow() {
+  nextTick(() => {
+    positionSubMenu()
+    if (!cleanupScroll) {
+      window.addEventListener('scroll', positionSubMenu, { passive: true })
+      window.addEventListener('resize', positionSubMenu, { passive: true })
+      cleanupScroll = () => {
+        window.removeEventListener('scroll', positionSubMenu)
+        window.removeEventListener('resize', positionSubMenu)
+      }
+    }
+  })
+}
+
+function onHide() {
+  setTimeout(() => {
+    cleanupScroll?.()
+    cleanupScroll = null
+  }, 200)
+}
+
+onUnmounted(() => {
+  cleanupScroll?.()
+})
 </script>
 
 <template>
   <div
+    ref="rootRef"
     class="hbr-btn"
     :class="{ 'has-children': children && children.length > 0, 'is-secondary': resolvedTheme === 'alt' }"
+    @mouseenter="onShow"
+    @focusin="onShow"
+    @mouseleave="onHide"
+    @focusout="onHide"
   >
     <VPButton
       v-bind="link ? { tag: 'a', href: link, target, rel } : {}"
@@ -55,7 +129,10 @@ const resolvedTheme = computed(() => resolveTheme(props.theme, props.type))
     />
     <div
       v-if="children && children.length > 0"
+      ref="subRef"
       class="hbr-btn-sub"
+      :class="anchorClass"
+      :style="subStyle"
     >
       <HbrButton
         v-for="child in children"
@@ -137,9 +214,8 @@ const resolvedTheme = computed(() => resolveTheme(props.theme, props.type))
   width: max-content;
   max-width: calc(100vw - 16px);
   opacity: 0;
-  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.15s, visibility 0s 0.15s;
+  transition: opacity 0.15s;
 }
 
 .hbr-btn-sub::before {
@@ -151,21 +227,15 @@ const resolvedTheme = computed(() => resolveTheme(props.theme, props.type))
   height: 10px;
 }
 
+.hbr-btn-sub.sub-below::before {
+  top: auto;
+  bottom: 100%;
+}
+
 .hbr-btn:hover > .hbr-btn-sub,
 .hbr-btn:focus-within > .hbr-btn-sub {
   opacity: 1;
-  visibility: visible;
   pointer-events: auto;
-  transition: opacity 0.15s, visibility 0s 0s;
-}
-
-/* Narrow screens: anchor from left edge to avoid centering overflow */
-@media (max-width: 480px) {
-  .hbr-btn-sub {
-    left: 8px;
-    transform: none;
-    justify-content: flex-start;
-  }
 }
 
 .hbr-btn-sub :deep(.vp-button) {
