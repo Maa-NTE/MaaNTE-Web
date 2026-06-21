@@ -1,3 +1,12 @@
+---
+title: GitHub DMCA 提报模板
+description: GitHub DMCA 及 Abuse 提报模板，用于针对仿冒仓库、搬运仓库进行快速维权
+head:
+  - - meta
+    - name: keywords
+      content: MaaNTE,DMCA,版权,AGPL-3.0,仿冒,滥用提报,GitHub
+---
+
 # GitHub DMCA / Abuse 提报模板（AGPL-3.0）
 
 用于针对仿冒仓库、搬运仓库、带毒二进制仓库进行快速提报。

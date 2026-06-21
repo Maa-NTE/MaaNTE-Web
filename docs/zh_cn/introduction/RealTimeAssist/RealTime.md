@@ -1,5 +1,10 @@
 ---
 title: 实时辅助
+description: MaaNTE 实时辅助功能，包含自动拾取、跳过剧情、自动传送等通用辅助能力
+head:
+  - - meta
+    - name: keywords
+      content: 异环,实时辅助,自动拾取,跳过剧情,自动传送,MaaNTE,前台控制器
 ---
 
 ## 简介

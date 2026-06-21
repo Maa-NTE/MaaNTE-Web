@@ -1,5 +1,10 @@
 ---
 title: 泯除方块
+description: MaaNTE 自动玩俄罗斯方块，支持后台运行
+head:
+  - - meta
+    - name: keywords
+      content: 异环,泯除方块,俄罗斯方块,都市闲趣,MaaNTE
 ---
 
 ## 简介

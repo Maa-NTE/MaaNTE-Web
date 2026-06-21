@@ -1,5 +1,10 @@
 ---
 title: 其它
+description: MaaNTE 其它功能，包含自动弹琴、自动抚摸等娱乐性功能
+head:
+  - - meta
+    - name: keywords
+      content: 异环,自动弹琴,自动抚摸,MIDI,娱乐,MaaNTE
 dir:
   order: 5
 index: true

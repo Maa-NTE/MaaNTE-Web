@@ -1,5 +1,10 @@
 ---
 title: 常见问题
+description: MaaNTE 常见问题解答，覆盖 MXU 界面、配置标签页、任务执行、控制器等高频问题
+head:
+  - - meta
+    - name: keywords
+      content: MaaNTE,常见问题,FAQ,MXU,配置,任务,控制器,报错,故障
 dir:
   order: 2
 ---

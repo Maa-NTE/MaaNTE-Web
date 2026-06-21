@@ -1,5 +1,10 @@
 ---
 title: 用户文档
+description: MaaNTE 用户文档，涵盖快速开始、常见问题、问题排查等使用指南
+head:
+  - - meta
+    - name: keywords
+      content: MaaNTE,用户文档,使用指南,常见问题,问题排查,异环辅助
 dir:
   order: 1
 index: true

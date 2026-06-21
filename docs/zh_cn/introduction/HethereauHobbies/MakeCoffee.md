@@ -1,5 +1,10 @@
 ---
-title: 	自动做咖啡
+title: 自动做咖啡
+description: MaaNTE 自动做咖啡功能，全自动完成都市体力刷取方斯
+head:
+  - - meta
+    - name: keywords
+      content: 异环,自动做咖啡,都市闲趣,店长特供,刷方斯,MaaNTE
 ---
 
 ## 简介

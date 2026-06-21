@@ -1,5 +1,10 @@
 ---
 title: 翻译术语表
+description: MaaNTE 翻译术语表，规范异环游戏术语在各语言版本中的统一译名
+head:
+  - - meta
+    - name: keywords
+      content: MaaNTE,翻译,术语表,本地化,异环,译名
 ---
 
 ::: warning 注意

@@ -1,5 +1,10 @@
 ---
 title: 家具领取
+description: MaaNTE 自动领取异象家具奖励，支持棉棉、仓鼠球、破损的木箱
+head:
+  - - meta
+    - name: keywords
+      content: 异环,家具领取,异象家具,棉棉,仓鼠球,都市大亨,MaaNTE
 ---
 
 领取异象家具的奖励。

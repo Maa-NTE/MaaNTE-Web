@@ -1,5 +1,10 @@
 ---
 title: 领取一咖舍收益
+description: MaaNTE 自动领取一咖舍收益，支持根据风向标自动替换商品补货
+head:
+  - - meta
+    - name: keywords
+      content: 异环,一咖舍,领取收益,自动补货,风向标,都市大亨,MaaNTE
 ---
 
 ## 简介

@@ -1,5 +1,10 @@
 ---
 title: 喷泉打卡
+description: MaaNTE 自动投币许愿喷泉打卡功能
+head:
+  - - meta
+    - name: keywords
+      content: 异环,喷泉打卡,投币许愿,MaaNTE
 ---
 
 ## 简介

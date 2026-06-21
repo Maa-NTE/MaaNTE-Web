@@ -1,5 +1,10 @@
 ---
 title: 自动弹琴
+description: MaaNTE 自动弹琴功能，读取 MIDI 谱子自动演奏钢琴，支持后台运行
+head:
+  - - meta
+    - name: keywords
+      content: 异环,自动弹琴,自动演奏,MIDI,钢琴,MaaNTE
 ---
 
 ## 简介

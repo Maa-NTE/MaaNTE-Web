@@ -1,5 +1,10 @@
 ---
 title: 自动驾驶数据集收集
+description: MaaNTE 自动驾驶数据集收集功能，录制游戏画面数据
+head:
+  - - meta
+    - name: keywords
+      content: 异环,自动驾驶,数据集,数据收集,录制,MaaNTE
 ---
 
 ::: info 控制器

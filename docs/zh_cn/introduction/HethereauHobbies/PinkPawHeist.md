@@ -1,5 +1,10 @@
 ---
 title: 粉爪大劫案
+description: MaaNTE 自动刷取粉爪大劫案，解放双手轻松获取奖励
+head:
+  - - meta
+    - name: keywords
+      content: 异环,粉爪大劫案,自动刷取,都市闲趣,MaaNTE,小吱
 ---
 
 ## 简介

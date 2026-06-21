@@ -1,5 +1,10 @@
 ---
 title: 功能介绍
+description: MaaNTE 功能一览，覆盖日常任务、实时辅助、都市大亨、都市闲趣等自动化功能模块
+head:
+  - - meta
+    - name: keywords
+      content: MaaNTE,功能介绍,自动钓鱼,音频闪避,实时辅助,粉爪大劫案,超强音,领取奖励,家具领取,都市闲趣
 dir:
   order: 2
 index: true

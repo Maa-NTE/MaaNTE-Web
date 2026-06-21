@@ -1,6 +1,11 @@
 ---
 home: true
 title: MaaNTE
+description: MaaNTE | MAA 异环小助手 — 由 MaaFramework 强力驱动的《异环》自动化辅助工具，支持自动钓鱼、实时闪避、粉爪大劫案、超强音等功能
+head:
+  - - meta
+    - name: keywords
+      content: MaaNTE,MAA,异环,Neverness to Everness,自动化,游戏辅助,MaaFramework,都市闲趣,实时辅助,开源
 topAlert:
   enabled: true
   label: 提醒

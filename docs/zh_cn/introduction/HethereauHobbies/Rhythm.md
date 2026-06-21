@@ -1,5 +1,10 @@
 ---
 title: 超强音
+description: MaaNTE 自动演奏音游"超强音"，支持自动选曲、连续演奏，轻松获取音游奖励
+head:
+  - - meta
+    - name: keywords
+      content: 异环,超强音,音游,自动演奏,迷星叫,都市闲趣,MaaNTE
 ---
 
 ## 简介

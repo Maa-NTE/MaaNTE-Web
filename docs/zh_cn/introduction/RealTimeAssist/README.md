@@ -1,5 +1,10 @@
 ---
 title: 实时辅助
+description: MaaNTE 实时辅助功能，包含自动拾取、跳过剧情、音频闪避、快速拾取等需前台控制器的功能
+head:
+  - - meta
+    - name: keywords
+      content: 异环,实时辅助,自动拾取,音频闪避,快速拾取,前台控制器,MaaNTE
 dir:
   order: 2
 index: true

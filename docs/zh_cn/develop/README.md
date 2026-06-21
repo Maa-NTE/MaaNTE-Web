@@ -1,5 +1,10 @@
 ---
 title: 开发指南
+description: MaaNTE 开发者文档，涵盖快速上手、Pipeline 编写、Python 自定义动作、编码规范、场景管理等
+head:
+  - - meta
+    - name: keywords
+      content: MaaNTE,开发指南,Pipeline,自定义动作,Python,MaaFramework,编码规范,场景管理,节点测试
 dir:
   order: 3
 index: true
