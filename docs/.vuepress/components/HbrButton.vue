@@ -201,10 +201,10 @@ onUnmounted(() => {
   text-shadow: 0 0 8px rgba(168, 85, 247, 0.20);
 }
 
-/* Sub-buttons: floating above parent, centered, wraps on narrow viewports */
+/* Sub-buttons: floating below parent, centered, wraps on narrow viewports */
 .hbr-btn-sub {
   position: absolute;
-  bottom: calc(100% + 8px);
+  top: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -221,7 +221,7 @@ onUnmounted(() => {
 .hbr-btn-sub::before {
   content: '';
   position: absolute;
-  top: 100%;
+  bottom: 100%;
   left: -8px;
   right: -8px;
   height: 10px;
