@@ -1,7 +1,7 @@
 ---
 title: 其它
 dir:
-  order: 5
+  order: 6
 index: true
 ---
 
