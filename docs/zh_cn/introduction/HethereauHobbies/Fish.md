@@ -1,5 +1,10 @@
 ---
 title: 钓鱼任务
+description: MaaNTE 自动钓鱼功能，支持自动抛竿、收杆、卖鱼、买鱼饵，可无限循环挂机
+head:
+  - - meta
+    - name: keywords
+      content: 异环,钓鱼,自动钓鱼,挂机,都市闲趣,MaaNTE
 ---
 
 ## 简介

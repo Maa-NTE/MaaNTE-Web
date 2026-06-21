@@ -1,5 +1,10 @@
 ---
 title: 快速拾取
+description: MaaNTE 快速拾取功能，持续按住F并滚动滚轮极速拾取物品
+head:
+  - - meta
+    - name: keywords
+      content: 异环,快速拾取,滚轮拾取,实时辅助,MaaNTE
 ---
 
 ## 简介

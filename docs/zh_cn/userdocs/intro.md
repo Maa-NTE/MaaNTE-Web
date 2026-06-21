@@ -1,5 +1,10 @@
 ---
 title: 快速开始
+description: MaaNTE 快速上手指南，从下载安装到配置使用，助你快速开启异环自动化之旅
+head:
+  - - meta
+    - name: keywords
+      content: MaaNTE,快速开始,下载,安装,配置,异环,自动化,教程
 dir:
   order: 1
 ---

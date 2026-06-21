@@ -1,5 +1,10 @@
 ---
 title: 抚摸
+description: MaaNTE 自动抚摸功能，检测并自动执行抚摸小动物的交互操作
+head:
+  - - meta
+    - name: keywords
+      content: 异环,抚摸,自动抚摸,小动物,互动,MaaNTE
 ---
 
 ## 简介

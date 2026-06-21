@@ -1,5 +1,10 @@
 ---
 title: 数据收集
+description: MaaNTE 数据收集功能，用于收集游戏数据
+head:
+  - - meta
+    - name: keywords
+      content: 异环,数据收集,自动驾驶,数据集,MaaNTE
 dir:
   order: 6
 index: true

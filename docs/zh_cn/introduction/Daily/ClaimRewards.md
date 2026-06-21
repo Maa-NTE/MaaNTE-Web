@@ -1,5 +1,10 @@
 ---
 title: 领取奖励
+description: MaaNTE 自动领取活跃度奖励及环期赏令奖励
+head:
+  - - meta
+    - name: keywords
+      content: 异环,领取奖励,活跃度,环期赏令,日常任务,MaaNTE
 ---
 
 ## 简介

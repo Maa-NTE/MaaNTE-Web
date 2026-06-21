@@ -1,5 +1,10 @@
 ---
 title: 都市闲趣
+description: MaaNTE 都市闲趣玩法自动化，包含钓鱼、做咖啡、粉爪大劫案、超强音、泯除方块等功能
+head:
+  - - meta
+    - name: keywords
+      content: 异环,都市闲趣,钓鱼,做咖啡,粉爪大劫案,超强音,俄罗斯方块,MaaNTE
 dir:
   order: 4
 index: true

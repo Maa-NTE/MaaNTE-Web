@@ -1,5 +1,10 @@
 ---
 title: 问题排查手册
+description: MaaNTE 问题排查手册，涵盖无法启动、无法开始任务、模拟器、截图、WebView2 等常见问题及解决方案
+head:
+  - - meta
+    - name: keywords
+      content: MaaNTE,问题排查,报错,无法启动,WebView2,模拟器,截图,故障排除
 dir:
   order: 3
 ---
