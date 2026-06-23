@@ -7,11 +7,6 @@ class RateLimitError extends Error {
 }
 
 const GROUP_IDS = ['1103323319', '1101147419', '1075143235', '713114598', '1106448578', '423431800', '836136969']
-const DEFAULT_PRIMARY_REQUEST_INTERVAL_MS = 21_000
-const rawPrimaryRequestInterval = Number(process.env.QQ_GROUP_INFO_PRIMARY_INTERVAL_MS)
-const PRIMARY_REQUEST_INTERVAL_MS = Number.isFinite(rawPrimaryRequestInterval)
-  ? rawPrimaryRequestInterval
-  : DEFAULT_PRIMARY_REQUEST_INTERVAL_MS
 const API_SOURCES = [
   {
     name: 'self-hosted API',
@@ -19,7 +14,6 @@ const API_SOURCES = [
     queryParam: 'id',
     ckey: process.env.QQ_API_KEY ?? '',
     keyParam: 'key',
-    minIntervalMs: PRIMARY_REQUEST_INTERVAL_MS,
     unwrap: unwrapPrimaryResponse,
   },
   {
