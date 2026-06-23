@@ -2,6 +2,10 @@ import { mkdir, rename, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+class RateLimitError extends Error {
+  name = 'RateLimitError'
+}
+
 const GROUP_IDS = ['1103323319', '1101147419', '1075143235', '713114598', '1106448578', '423431800', '836136969']
 const DEFAULT_PRIMARY_REQUEST_INTERVAL_MS = 21_000
 const rawPrimaryRequestInterval = Number(process.env.QQ_GROUP_INFO_PRIMARY_INTERVAL_MS)
@@ -203,8 +207,4 @@ function getRetryDelayMs(source, retryCount) {
 
 function isRateLimitError(error) {
   return error instanceof RateLimitError
-}
-
-class RateLimitError extends Error {
-  name = 'RateLimitError'
 }
