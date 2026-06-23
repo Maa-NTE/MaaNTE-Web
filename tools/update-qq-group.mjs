@@ -1,4 +1,4 @@
-import { mkdir, rename, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -68,7 +68,7 @@ async function fetchGroupFromSource(groupId, source) {
 
     if (response.ok) {
       try {
-        return normalizeGroup(groupId, source.unwrap(await response.json()))
+        return normalizeGroup(groupId, source.unwrap(await readJsonResponse(response)))
       } catch (error) {
         if (!isRateLimitError(error) || retryCount === MAX_RETRY_COUNT) {
           throw error
@@ -87,6 +87,26 @@ async function fetchGroupFromSource(groupId, source) {
   }
 
   throw new Error('Request retries exhausted')
+}
+
+async function readJsonResponse(response) {
+  const contentType = response.headers.get('content-type') ?? ''
+  const body = await response.text()
+
+  if (!contentType.toLowerCase().includes('json')) {
+    throw new Error(`expected JSON, received ${describeContentType(contentType, body)}`)
+  }
+
+  try {
+    return JSON.parse(body)
+  } catch {
+    throw new Error('invalid JSON response')
+  }
+}
+
+function describeContentType(contentType, body) {
+  if (/^\s*<!doctype html|^\s*<html/i.test(body)) return 'HTML'
+  return contentType.split(';', 1)[0] || 'an unknown content type'
 }
 
 function unwrapPrimaryResponse(response) {
@@ -133,17 +153,24 @@ function compareGroups(left, right) {
   return leftCount - rightCount || String(left.group_id).localeCompare(String(right.group_id))
 }
 
+const previousOutput = await readPreviousOutput()
+const previousGroups = new Map(
+  (previousOutput?.groups ?? [])
+    .filter((group) => group?.ok && typeof group.group_id === 'string')
+    .map((group) => [group.group_id, group]),
+)
 const groups = []
 
 for (const groupId of GROUP_IDS) {
   try {
     groups.push(await fetchGroup(groupId))
   } catch (error) {
-    groups.push({
-      ok: false,
-      group_id: groupId,
-      error: error instanceof Error ? error.message : 'Unknown error',
-    })
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    const previousGroup = previousGroups.get(groupId)
+
+    groups.push(previousGroup
+      ? { ...previousGroup, stale: true, error: message }
+      : { ok: false, group_id: groupId, error: message })
   }
 
   await sleep(REQUEST_DELAY_MS)
@@ -201,4 +228,12 @@ function getRetryDelayMs(source, retryCount) {
 
 function isRateLimitError(error) {
   return error instanceof RateLimitError
+}
+
+async function readPreviousOutput() {
+  try {
+    return JSON.parse(await readFile(outputPath, 'utf8'))
+  } catch {
+    return null
+  }
 }

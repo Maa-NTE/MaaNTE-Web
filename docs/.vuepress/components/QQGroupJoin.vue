@@ -141,6 +141,11 @@ onMounted(async () => {
       throw new Error(`HTTP ${response.status}`)
     }
 
+    const contentType = response.headers.get('content-type') ?? ''
+    if (!contentType.toLowerCase().includes('json')) {
+      throw new Error('群信息暂时不可用，请稍后重试')
+    }
+
     groupData.value = await response.json()
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : t.value.unknownError
@@ -259,7 +264,7 @@ function copyButtonLabel(groupId: string): string {
 
     <div v-else-if="!selectedGroup" class="qq-group__empty">
       <h2>{{ t.noGroupsTitle }}</h2>
-      <p>
+      <p class="qq-group__error">
         {{ errorMessage || t.noGroupsMsg(memberLimit) }}
       </p>
       <p class="qq-group__meta">{{ t.lastSync }}：{{ updatedAt }}</p>
@@ -318,6 +323,7 @@ function copyButtonLabel(groupId: string): string {
 
 <style scoped>
 .qq-group {
+  min-width: 0;
   margin: 32px 0;
   padding: 28px;
   border: 1px solid var(--vp-c-border);
@@ -327,7 +333,15 @@ function copyButtonLabel(groupId: string): string {
 
 .qq-group__state,
 .qq-group__empty {
+  min-width: 0;
   color: var(--vp-c-text-2);
+}
+
+.qq-group__error {
+  max-height: 8em;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .qq-group__empty h2,
@@ -451,13 +465,15 @@ function copyButtonLabel(groupId: string): string {
 }
 
 .qq-group__details em {
+  min-width: 0;
   color: var(--vp-c-text-3);
   font-style: normal;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .qq-group__details-actions {
   display: flex;
+  min-width: 0;
   gap: 12px;
   align-items: center;
 }
