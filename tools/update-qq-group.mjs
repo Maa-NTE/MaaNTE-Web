@@ -11,7 +11,7 @@ const PRIMARY_REQUEST_INTERVAL_MS = Number.isFinite(rawPrimaryRequestInterval)
 const API_SOURCES = [
   {
     name: 'self-hosted API',
-    baseUrl: process.env.QQ_GROUP_INFO_API ?? 'http://api.maante.org/apidata',
+    baseUrl: process.env.QQ_GROUP_INFO_API ?? 'http://122.51.38.115/apidata',
     queryParam: 'id',
     ckey: process.env.QQ_API_KEY ?? '',
     keyParam: 'key',
