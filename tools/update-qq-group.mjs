@@ -6,7 +6,7 @@ class RateLimitError extends Error {
   name = 'RateLimitError'
 }
 
-const GROUP_IDS = ['1103323319', '1101147419', '1075143235', '713114598', '1106448578', '423431800', '836136969']
+const GROUP_IDS = ['1103323319', '1101147419', '1075143235', '1106448578', '423431800', '836136969']
 const API_SOURCES = [
   {
     name: 'self-hosted API',
