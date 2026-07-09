@@ -8,9 +8,9 @@ Online map real-time positioning and navigation starts a bidirectional Navi WebS
 
 ::: info Controller
 
-- [x] Desktop - Default
-- [x] Desktop - Front
-- [x] Desktop - Background
+- [x] Win32 - Default
+- [x] Win32 - Front
+- [x] Win32 - Background
 
 :::
 
@@ -277,9 +277,25 @@ When a valid coordinate exists, the return value is `(x, y, z)`, all `float`.
 
 These values are raw 3D coordinates from game network data. The API does not translate, rotate, scale, project, or calibrate them to any map.
 
-`None` may be returned when capture has not started, no valid coordinate has been received, the latest coordinate is older than `max_age`, movement data is interrupted during teleporting or instance changes, the network stream changes, or the current packet contains no recognizable coordinate.
+`None` may be returned in the following cases:
+
+- `start()` has not been called.
+- No valid coordinate has been received after startup.
+- The latest coordinate is older than `max_age`.
+- Movement data is temporarily interrupted during teleporting or instance changes.
+- The network stream changes and the new movement stream has not been confirmed.
+- The current packet contains no recognizable coordinate.
 
 `read()` is non-blocking. Returning `None` does not mean the instance has stopped and does not necessarily mean an error occurred.
+
+```python
+coordinate = capture.read(max_age=0.5)
+
+if coordinate is None:
+    return
+
+x, y, z = coordinate
+```
 
 #### `close()`
 
@@ -293,6 +309,8 @@ Stops background capture and releases related resources.
 - Stops and waits for background capture when already running.
 - After it is called, the instance no longer receives new coordinates.
 
+`close()` does not proactively clear the latest cached coordinate. Before the cache expires, `read()` may still return the last coordinate captured before closing.
+
 Use `try/finally` to ensure resources are released:
 
 ```python
@@ -305,7 +323,44 @@ finally:
     capture.close()
 ```
 
-### Status, Lifecycle, and Limits
+### Complete Example
+
+```python
+import time
+
+from nte_coordinate_api import CoordinateCapture
+
+
+capture = CoordinateCapture(
+    interface=None,
+    packet_filter="tcp port 30031 or udp",
+)
+
+try:
+    capture.start()
+
+    while True:
+        coordinate = capture.read(max_age=1.0)
+        if coordinate is not None:
+            x, y, z = coordinate
+            print(f"x={x:.2f}, y={y:.2f}, z={z:.2f}")
+
+        time.sleep(0.1)
+finally:
+    capture.close()
+```
+
+### Status and Lifecycle
+
+The instance has no public status property. Callers should determine its current status from method results:
+
+| Operation result | Meaning |
+| --- | --- |
+| `start()` returns normally | Background capture has started or was already started. |
+| `start()` raises an exception | Capture failed to start. |
+| `read()` returns coordinates | A valid, unexpired coordinate is currently available. |
+| `read()` returns `None` | No valid coordinate satisfying the real-time requirement is currently available. |
+| `close()` returns normally | Capture resources have been released. |
 
 The recommended lifecycle is:
 
@@ -313,11 +368,30 @@ The recommended lifecycle is:
 create instance -> start() -> read() repeatedly -> close()
 ```
 
-During normal movement, coordinates continue to update with the character's position. Teleporting, switching maps or instances, switching characters, reconnecting the network, resetting movement timestamps, or switching to a new game network stream may cause `read()` to briefly return `None`.
+### Thread Safety
+
+- The background capture thread updates the latest coordinate.
+- `read()` can be called from other threads.
+- Reading and updating the latest coordinate are synchronized.
+- Calling `start()` or `close()` from multiple threads at the same time is not recommended.
+- One instance should have its lifecycle managed by a single business component.
+
+### Coordinate Continuity
+
+During normal movement, coordinates continue to update with the character's position.
+
+The following operations may cause `read()` to briefly return `None`:
+
+- Teleporting.
+- Switching maps or instances.
+- Switching characters.
+- Network reconnection.
+- Game movement timestamp reset.
+- The game switching to a new network stream.
 
 The interface tries to rediscover a valid movement stream. Callers should wait for recovery according to their own business needs instead of destroying and recreating the instance after a single `None`.
 
-Limitations:
+### Limitations
 
 - This interface only reads network traffic; it does not send or modify packets.
 - The caller needs system permission to access the selected network interface.

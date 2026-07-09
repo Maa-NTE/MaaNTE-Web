@@ -7,4 +7,4 @@ index: true
 
 Used to collect player game data and store it locally for other tasks.
 
-This category currently contains player-data synchronization features such as recording character city ability levels.
+- [Record Character City Abilities](SyncCharacterAbilityCityAbility.md): automatically recognizes all characters' city ability levels and records them in the configuration file.

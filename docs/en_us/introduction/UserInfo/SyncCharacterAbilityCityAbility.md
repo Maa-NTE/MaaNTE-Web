@@ -14,9 +14,9 @@ Before running this task, make sure the `stop task hotkey` is configured in MaaN
 
 ::: info Controller
 
-- [ ] Desktop - Default
-- [x] Desktop - Front
-- [ ] Desktop - Background
+- [ ] Win32 - Default
+- [x] Win32 - Front
+- [ ] Win32 - Background
 
 :::
 

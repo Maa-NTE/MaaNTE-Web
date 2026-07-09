@@ -58,7 +58,7 @@ This page answers common MaaNTE questions. If you run into problems while using 
 
 - What is a task?
 
-    Each MaaNTE automation feature is an independent task that can be enabled or disabled as needed. Every task corresponds to a specific in-game operation or activity, such as [Claim Rewards](../introduction/Daily/ClaimRewards.md) or [Fishing Quest](../introduction/HethereauHobbies/Fish.md).
+    Each MaaNTE automation feature is an independent task that can be enabled or disabled as needed. Every task corresponds to a specific in-game operation or activity, such as [Claim Rewards](../introduction/Daily/ClaimRewards.md) or [Auto Fishing](../introduction/HethereauHobbies/Fish.md).
 
     Select the tasks you want in the task list. MaaNTE runs them in list order.
 
@@ -69,7 +69,7 @@ This page answers common MaaNTE questions. If you run into problems while using 
     - **Daily tasks**: daily repeated actions such as claiming activity rewards, battle pass rewards, furniture rewards, and The Cafe by Origen earnings.
     - **Real-time assistance**: helpers that run while playing, such as auto pickup, story skipping, auto teleport, audio dodge, and quick pickup.
     - **City Tycoon**: features related to The Cafe by Origen, real estate, and furniture.
-    - **Hethereau Hobbies**: automation for activities such as coffee making, fishing, Pink Paw Heist, Tetrominoes, and Super Sound.
+    - **Hethereau Hobbies**: automation for activities such as coffee making, fishing, Pink Paws Heist, Tetrominoes, and Super Sound.
     - **Others**: entertainment features and unfinished features such as auto piano, touch, and fountain check-in.
     - **Data collection**: data collection for feature development and optimization. These are disabled by default.
 
@@ -91,9 +91,9 @@ This page answers common MaaNTE questions. If you run into problems while using 
 
     A controller is the MaaFramework component that interacts with the game window. MaaNTE provides three controller modes:
 
-    - **Desktop - Default**: operates in the background when the game window is not focused. You can usually use the computer for other work while tasks run, though mouse focus may occasionally be taken.
-    - **Desktop - Front**: directly operates the foreground game window. The game window must stay visible and unobstructed, and the mouse is fully occupied while tasks run.
-    - **Desktop - Background**: simulates operations in the background. The game window may be covered but must not be minimized. It moves the window instead of moving the mouse around.
+    - **Win32 - Default**: operates in the background when the game window is not focused. You can usually use the computer for other work while tasks run, though mouse focus may occasionally be taken.
+    - **Win32 - Front**: directly operates the foreground game window. The game window must stay visible and unobstructed, and the mouse is fully occupied while tasks run.
+    - **Win32 - Background**: simulates operations in the background. The game window may be covered but must not be minimized. It moves the window instead of moving the mouse around.
 
     Choose a controller in the connection settings in the upper-right corner. Each task document also lists supported controller types.
 
