@@ -58,15 +58,8 @@ export function genThemeLocales(): LocaleConfig<ThemeLocaleData> {
       footer: footer[locale.name],
     }
 
-    // 根路径复用 zh_cn 的导航与集合（供 404 等回退页面使用）
-    if (locale.name === 'zh_cn') {
-      themeLocales['/'] = {
-        home: '/zh_cn/',
-        navbar: navigationComponents.navbar,
-        collections: navigationComponents.collections,
-        footer: footer.zh_cn,
-      }
-    }
+    // Do not register "/" as a theme locale. Plume enumerates theme locales in
+    // the language switcher, so adding "/" here duplicates the zh_cn option.
   }
 
   return themeLocales
