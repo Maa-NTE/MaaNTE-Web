@@ -7,28 +7,14 @@ class RateLimitError extends Error {
 }
 
 const GROUP_IDS = ['1103323319', '1101147419', '1075143235', '1106448578', '423431800', '836136969']
-const API_SOURCES = [
-  {
-    name: 'self-hosted API',
-    baseUrl: process.env.QQ_GROUP_INFO_API ?? 'http://122.51.38.115/apidata',
-    queryParam: 'id',
-    ckey: process.env.QQ_API_KEY ?? '',
-    keyParam: 'key',
-    unwrap: unwrapPrimaryResponse,
-  },
-  {
-    name: 'fallback API',
-    baseUrl: process.env.QQ_GROUP_INFO_FALLBACK_API ?? 'https://www.tmini.net/api/group?type=',
-    queryParam: 'qq',
-    ckey: process.env.QQ_API_KEY ?? '',
-    keyParam: 'ckey',
-    unwrap: unwrapPrimaryResponse,
-  },
-]
+const API_SOURCES = createApiSources()
 const DEFAULT_MEMBER_LIMIT = 2000
 const rawMemberLimit = Number(process.env.QQ_GROUP_MEMBER_LIMIT)
 const MEMBER_LIMIT = Number.isFinite(rawMemberLimit) ? rawMemberLimit : DEFAULT_MEMBER_LIMIT
-const REQUEST_DELAY_MS = 350
+const rawRequestDelay = Number(process.env.QQ_GROUP_REQUEST_DELAY_MS)
+const REQUEST_DELAY_MS = Number.isFinite(rawRequestDelay) ? rawRequestDelay : 350
+const rawRequestTimeout = Number(process.env.QQ_GROUP_REQUEST_TIMEOUT_MS)
+const REQUEST_TIMEOUT_MS = Number.isFinite(rawRequestTimeout) ? rawRequestTimeout : 10_000
 const MAX_RETRY_COUNT = 2
 const sourceNextRequestAt = new WeakMap()
 
@@ -36,6 +22,30 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const outputPath = process.env.QQ_GROUP_OUTPUT
   ? path.resolve(process.env.QQ_GROUP_OUTPUT)
   : path.resolve(__dirname, '../docs/.vuepress/public/data/qq-group.json')
+
+function createApiSources(env = process.env) {
+  const sources = []
+
+  if (env.QQ_GROUP_INFO_API) {
+    sources.push({
+      name: 'configured API',
+      baseUrl: env.QQ_GROUP_INFO_API,
+      queryParam: env.QQ_GROUP_INFO_QUERY_PARAM || 'id',
+      ckey: env.QQ_API_KEY || '',
+      keyParam: env.QQ_GROUP_INFO_KEY_PARAM || 'key',
+      unwrap: unwrapGroupResponse,
+    })
+  }
+
+  sources.push({
+    name: 'UAPI',
+    baseUrl: env.QQ_GROUP_INFO_FALLBACK_API || 'https://uapis.cn/api/v1/social/qq/groupinfo',
+    queryParam: env.QQ_GROUP_INFO_FALLBACK_QUERY_PARAM || 'group_id',
+    unwrap: unwrapGroupResponse,
+  })
+
+  return sources
+}
 
 async function fetchGroup(groupId) {
   const errors = []
@@ -64,6 +74,7 @@ async function fetchGroupFromSource(groupId, source) {
 
     const response = await fetch(url, {
       headers: { accept: 'application/json', ...source.headers },
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     })
 
     if (response.ok) {
@@ -109,7 +120,11 @@ function describeContentType(contentType, body) {
   return contentType.split(';', 1)[0] || 'an unknown content type'
 }
 
-function unwrapPrimaryResponse(response) {
+function unwrapGroupResponse(response) {
+  if (response?.code === undefined) {
+    return response
+  }
+
   if (response?.code === 219) {
     throw new RateLimitError(`API rate limited: ${response.msg ?? 'too many requests'}`)
   }
@@ -124,14 +139,23 @@ function unwrapPrimaryResponse(response) {
 function normalizeGroup(groupId, data) {
   const memberCount = toNumber(data.member_count)
   const maxMemberCount = toNumber(data.max_member_count)
+  const responseGroupId = String(data.group_id ?? groupId)
 
   if (memberCount === undefined) {
     throw new Error('Invalid response: missing member_count')
   }
 
+  if (responseGroupId !== groupId) {
+    throw new Error(`Invalid response: requested group ${groupId}, received ${responseGroupId}`)
+  }
+
+  if (maxMemberCount !== undefined && memberCount > maxMemberCount) {
+    throw new Error(`Invalid response: member_count ${memberCount} exceeds max_member_count ${maxMemberCount}`)
+  }
+
   return {
     ok: true,
-    group_id: String(data.group_id ?? groupId),
+    group_id: responseGroupId,
     group_name: toOptionalString(data.group_name),
     member_count: memberCount,
     max_member_count: maxMemberCount,
@@ -143,8 +167,10 @@ function toOptionalString(value) {
 }
 
 function toNumber(value) {
+  if (value === null || value === undefined || value === '') return undefined
+
   const numberValue = Number(value)
-  return Number.isFinite(numberValue) ? numberValue : undefined
+  return Number.isInteger(numberValue) && numberValue >= 0 ? numberValue : undefined
 }
 
 function compareGroups(left, right) {
@@ -153,56 +179,57 @@ function compareGroups(left, right) {
   return leftCount - rightCount || String(left.group_id).localeCompare(String(right.group_id))
 }
 
-const previousOutput = await readPreviousOutput()
-const previousGroups = new Map(
-  (previousOutput?.groups ?? [])
-    .filter((group) => group?.ok && typeof group.group_id === 'string')
-    .map((group) => [group.group_id, group]),
-)
-const groups = []
+async function main() {
+  const previousOutput = await readPreviousOutput()
+  const previousGroups = new Map(
+    (previousOutput?.groups ?? [])
+      .filter((group) => group?.ok && typeof group.group_id === 'string')
+      .map((group) => [group.group_id, group]),
+  )
+  const groups = []
 
-for (const groupId of GROUP_IDS) {
-  try {
-    groups.push(await fetchGroup(groupId))
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    const previousGroup = previousGroups.get(groupId)
+  for (const groupId of GROUP_IDS) {
+    try {
+      groups.push(await fetchGroup(groupId))
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error'
+      const previousGroup = previousGroups.get(groupId)
 
-    groups.push(previousGroup
-      ? { ...previousGroup, stale: true, error: message }
-      : { ok: false, group_id: groupId, error: message })
+      groups.push(previousGroup
+        ? { ...previousGroup, stale: true, error: message }
+        : { ok: false, group_id: groupId, error: message })
+    }
+
+    await sleep(REQUEST_DELAY_MS)
   }
 
-  await sleep(REQUEST_DELAY_MS)
-}
+  groups.sort(compareGroups)
+  groups.forEach((group) => {
+    group.joinable = isJoinable(group)
+  })
 
-groups.sort(compareGroups)
-groups.forEach((group) => {
-  group.joinable = isJoinable(group)
-})
+  const candidates = groups.filter((group) => group.joinable)
+  const selected = candidates[0] ?? null
+  const output = {
+    updated_at: new Date().toISOString(),
+    member_limit: MEMBER_LIMIT,
+    selected_group_id: selected?.group_id ?? null,
+    groups,
+  }
 
-const candidates = groups.filter((group) => group.joinable)
+  await mkdir(path.dirname(outputPath), { recursive: true })
+  await writeFile(`${outputPath}.tmp`, `${JSON.stringify(output, null, 2)}\n`, 'utf8')
+  await rename(`${outputPath}.tmp`, outputPath)
 
-const selected = candidates[0] ?? null
-const output = {
-  updated_at: new Date().toISOString(),
-  member_limit: MEMBER_LIMIT,
-  selected_group_id: selected?.group_id ?? null,
-  groups,
-}
-
-await mkdir(path.dirname(outputPath), { recursive: true })
-await writeFile(`${outputPath}.tmp`, `${JSON.stringify(output, null, 2)}\n`, 'utf8')
-await rename(`${outputPath}.tmp`, outputPath)
-
-if (selected) {
-  console.log(`Selected QQ group ${selected.group_id} with ${selected.member_count} members.`)
-} else {
-  console.log(`No QQ group below ${MEMBER_LIMIT} members was found.`)
+  if (selected) {
+    console.log(`Selected QQ group ${selected.group_id} with ${selected.member_count} members.`)
+  } else {
+    console.log(`No QQ group below ${MEMBER_LIMIT} members was found.`)
+  }
 }
 
 function isJoinable(group) {
-  return Boolean(group.ok && typeof group.member_count === 'number' && group.member_count < MEMBER_LIMIT)
+  return Boolean(group.ok && !group.stale && typeof group.member_count === 'number' && group.member_count < MEMBER_LIMIT)
 }
 
 function sleep(ms) {
@@ -237,3 +264,10 @@ async function readPreviousOutput() {
     return null
   }
 }
+
+const isMainModule = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+if (isMainModule) {
+  await main()
+}
+
+export { createApiSources, isJoinable, normalizeGroup }

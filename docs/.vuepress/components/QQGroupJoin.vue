@@ -95,6 +95,7 @@ interface QQGroup {
   max_member_count?: number
   ok?: boolean
   joinable?: boolean
+  stale?: boolean
   error?: string
 }
 
@@ -121,7 +122,9 @@ onBeforeUnmount(() => {
 const groups = computed(() => groupData.value?.groups ?? [])
 const selectedGroup = computed(() => {
   const selectedGroupId = groupData.value?.selected_group_id
-  return groups.value.find((group) => group.group_id === selectedGroupId) ?? null
+  return groups.value.find((group) => (
+    group.group_id === selectedGroupId && group.joinable && !group.stale
+  )) ?? null
 })
 const memberLimit = computed(() => groupData.value?.member_limit ?? 2000)
 
@@ -172,7 +175,7 @@ function formatCount(value?: number): string {
 }
 
 function hasMemberCount(group: QQGroup): boolean {
-  return typeof group.member_count === 'number' && Number.isFinite(group.member_count)
+  return !group.stale && typeof group.member_count === 'number' && Number.isFinite(group.member_count)
 }
 
 function formatGroupMemberCount(group: QQGroup): string {

@@ -67,6 +67,7 @@ jobs:
       - name: Update QQ group data
         run: pnpm run qq-group:update
         env:
+          QQ_GROUP_INFO_API: ${{ vars.QQ_GROUP_INFO_API }}
           QQ_API_KEY: ${{ secrets.QQ_API_KEY }}
 
       - name: Build with VuePress
