@@ -38,12 +38,18 @@ test('uses only UAPI unless the configured API is explicitly enabled', () => {
 test('fetches three groups at a time with one delay between two batches', async () => {
   const events = []
   const groupIds = ['1', '2', '3', '4', '5', '6']
+  let inFlight = 0
+  let maxInFlight = 0
 
   const groups = await fetchGroupsInBatches(groupIds, new Map(), {
     batchSize: 3,
     batchDelayMs: 60_000,
     fetchGroupFn: async (groupId) => {
+      inFlight += 1
+      maxInFlight = Math.max(maxInFlight, inFlight)
       events.push(`fetch:${groupId}`)
+      await new Promise((resolve) => setTimeout(resolve, 1))
+      inFlight -= 1
       return { ok: true, group_id: groupId, member_count: Number(groupId) }
     },
     sleepFn: async (delayMs) => {
@@ -60,6 +66,7 @@ test('fetches three groups at a time with one delay between two batches', async 
     'fetch:5',
     'fetch:6',
   ])
+  assert.equal(maxInFlight, 1)
   assert.deepEqual(groups.map((group) => group.group_id), groupIds)
 })
 

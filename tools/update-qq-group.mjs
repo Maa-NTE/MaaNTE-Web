@@ -202,18 +202,20 @@ async function fetchGroupsInBatches(
 
   for (let offset = 0; offset < groupIds.length; offset += batchSize) {
     const batchIds = groupIds.slice(offset, offset + batchSize)
-    const batchGroups = await Promise.all(batchIds.map(async (groupId) => {
+    const batchGroups = []
+
+    for (const groupId of batchIds) {
       try {
-        return await fetchGroupFn(groupId)
+        batchGroups.push(await fetchGroupFn(groupId))
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown error'
         const previousGroup = previousGroups.get(groupId)
 
-        return previousGroup
+        batchGroups.push(previousGroup
           ? { ...previousGroup, stale: true, error: message }
-          : { ok: false, group_id: groupId, error: message }
+          : { ok: false, group_id: groupId, error: message })
       }
-    }))
+    }
 
     groups.push(...batchGroups)
 
