@@ -35,7 +35,7 @@ const outputPath = process.env.QQ_GROUP_OUTPUT
 function createApiSources(env = process.env) {
   const sources = []
 
-  if (env.QQ_GROUP_INFO_API) {
+  if (env.QQ_GROUP_USE_CONFIGURED_API === 'true' && env.QQ_GROUP_INFO_API) {
     sources.push({
       name: 'configured API',
       baseUrl: env.QQ_GROUP_INFO_API,

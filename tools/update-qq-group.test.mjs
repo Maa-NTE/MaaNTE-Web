@@ -15,6 +15,7 @@ test('keeps a configured self-hosted API ahead of the public fallback', () => {
   const sources = createApiSources({
     QQ_GROUP_INFO_API: 'https://groups.example.test/info',
     QQ_API_KEY: 'secret',
+    QQ_GROUP_USE_CONFIGURED_API: 'true',
   })
 
   assert.equal(sources.length, 2)
@@ -22,6 +23,16 @@ test('keeps a configured self-hosted API ahead of the public fallback', () => {
   assert.equal(sources[0].queryParam, 'id')
   assert.equal(sources[0].ckey, 'secret')
   assert.equal(sources[1].baseUrl, 'https://uapis.cn/api/v1/social/qq/groupinfo')
+})
+
+test('uses only UAPI unless the configured API is explicitly enabled', () => {
+  const sources = createApiSources({
+    QQ_GROUP_INFO_API: 'https://groups.example.test/info',
+    QQ_API_KEY: 'secret',
+  })
+
+  assert.equal(sources.length, 1)
+  assert.equal(sources[0].name, 'UAPI')
 })
 
 test('fetches three groups at a time with one delay between two batches', async () => {
