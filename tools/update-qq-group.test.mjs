@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { createApiSources, fetchGroupsInBatches, isJoinable, normalizeGroup } from './update-qq-group.mjs'
+import { createApiSources, fetchGroupsInBatches, isJoinable, normalizeGroup, parseJinaJson } from './update-qq-group.mjs'
 
 test('uses the live public API by default', () => {
   const sources = createApiSources({})
@@ -33,6 +33,13 @@ test('uses only UAPI unless the configured API is explicitly enabled', () => {
 
   assert.equal(sources.length, 1)
   assert.equal(sources[0].name, 'UAPI')
+})
+
+test('parses JSON wrapped by the Jina reader', () => {
+  assert.deepEqual(parseJinaJson('Title: QQ group\n\nMarkdown Content:\n{"group_id":"1","member_count":2}\n'), {
+    group_id: '1',
+    member_count: 2,
+  })
 })
 
 test('fetches three groups at a time with one delay between two batches', async () => {

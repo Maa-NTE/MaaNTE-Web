@@ -69,8 +69,9 @@ jobs:
         env:
           QQ_GROUP_BATCH_SIZE: 3
           QQ_GROUP_BATCH_DELAY_MS: 60000
-          QQ_GROUP_INFO_FALLBACK_API: https://uapis.cn/api/v1/social/qq/groupinfo
+          QQ_GROUP_INFO_FALLBACK_API: https://r.jina.ai/http://uapis.cn/api/v1/social/qq/groupinfo
           QQ_GROUP_INFO_FALLBACK_QUERY_PARAM: group_id
+          QQ_GROUP_INFO_FALLBACK_RESPONSE_FORMAT: jina
 
       - name: Build with VuePress
         run: pnpm run docs:build

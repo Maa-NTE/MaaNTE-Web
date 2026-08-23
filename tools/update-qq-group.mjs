@@ -50,6 +50,7 @@ function createApiSources(env = process.env) {
     name: 'UAPI',
     baseUrl: env.QQ_GROUP_INFO_FALLBACK_API || 'https://uapis.cn/api/v1/social/qq/groupinfo',
     queryParam: env.QQ_GROUP_INFO_FALLBACK_QUERY_PARAM || 'group_id',
+    responseFormat: env.QQ_GROUP_INFO_FALLBACK_RESPONSE_FORMAT || 'json',
     unwrap: unwrapGroupResponse,
   })
 
@@ -88,7 +89,7 @@ async function fetchGroupFromSource(groupId, source) {
 
     if (response.ok) {
       try {
-        return normalizeGroup(groupId, source.unwrap(await readJsonResponse(response)))
+        return normalizeGroup(groupId, source.unwrap(await readJsonResponse(response, source)))
       } catch (error) {
         if (!isRateLimitError(error) || retryCount === MAX_RETRY_COUNT) {
           throw error
@@ -109,9 +110,13 @@ async function fetchGroupFromSource(groupId, source) {
   throw new Error('Request retries exhausted')
 }
 
-async function readJsonResponse(response) {
+async function readJsonResponse(response, source = {}) {
   const contentType = response.headers.get('content-type') ?? ''
   const body = await response.text()
+
+  if (source.responseFormat === 'jina') {
+    return parseJinaJson(body)
+  }
 
   if (!contentType.toLowerCase().includes('json')) {
     throw new Error(`expected JSON, received ${describeContentType(contentType, body)}`)
@@ -121,6 +126,18 @@ async function readJsonResponse(response) {
     return JSON.parse(body)
   } catch {
     throw new Error('invalid JSON response')
+  }
+}
+
+function parseJinaJson(body) {
+  const marker = 'Markdown Content:'
+  const markerIndex = body.indexOf(marker)
+  const json = markerIndex >= 0 ? body.slice(markerIndex + marker.length).trim() : body.trim()
+
+  try {
+    return JSON.parse(json)
+  } catch {
+    throw new Error('invalid Jina JSON response')
   }
 }
 
@@ -303,4 +320,4 @@ if (isMainModule) {
   await main()
 }
 
-export { createApiSources, fetchGroupsInBatches, isJoinable, normalizeGroup }
+export { createApiSources, fetchGroupsInBatches, isJoinable, normalizeGroup, parseJinaJson }
