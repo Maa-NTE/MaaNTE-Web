@@ -15,6 +15,15 @@ const rawRequestDelay = Number(process.env.QQ_GROUP_REQUEST_DELAY_MS)
 const REQUEST_DELAY_MS = Number.isFinite(rawRequestDelay) ? rawRequestDelay : 350
 const rawRequestTimeout = Number(process.env.QQ_GROUP_REQUEST_TIMEOUT_MS)
 const REQUEST_TIMEOUT_MS = Number.isFinite(rawRequestTimeout) ? rawRequestTimeout : 10_000
+const DEFAULT_GROUP_BATCH_SIZE = 3
+const rawGroupBatchSize = Number(process.env.QQ_GROUP_BATCH_SIZE)
+const GROUP_BATCH_SIZE = Number.isInteger(rawGroupBatchSize) && rawGroupBatchSize > 0
+  ? rawGroupBatchSize
+  : DEFAULT_GROUP_BATCH_SIZE
+const rawGroupBatchDelay = Number(process.env.QQ_GROUP_BATCH_DELAY_MS)
+const GROUP_BATCH_DELAY_MS = Number.isFinite(rawGroupBatchDelay) && rawGroupBatchDelay >= 0
+  ? rawGroupBatchDelay
+  : 60_000
 const MAX_RETRY_COUNT = 2
 const sourceNextRequestAt = new WeakMap()
 
@@ -179,6 +188,43 @@ function compareGroups(left, right) {
   return leftCount - rightCount || String(left.group_id).localeCompare(String(right.group_id))
 }
 
+async function fetchGroupsInBatches(
+  groupIds,
+  previousGroups,
+  {
+    batchSize = GROUP_BATCH_SIZE,
+    batchDelayMs = GROUP_BATCH_DELAY_MS,
+    fetchGroupFn = fetchGroup,
+    sleepFn = sleep,
+  } = {},
+) {
+  const groups = []
+
+  for (let offset = 0; offset < groupIds.length; offset += batchSize) {
+    const batchIds = groupIds.slice(offset, offset + batchSize)
+    const batchGroups = await Promise.all(batchIds.map(async (groupId) => {
+      try {
+        return await fetchGroupFn(groupId)
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error'
+        const previousGroup = previousGroups.get(groupId)
+
+        return previousGroup
+          ? { ...previousGroup, stale: true, error: message }
+          : { ok: false, group_id: groupId, error: message }
+      }
+    }))
+
+    groups.push(...batchGroups)
+
+    if (offset + batchSize < groupIds.length) {
+      await sleepFn(batchDelayMs)
+    }
+  }
+
+  return groups
+}
+
 async function main() {
   const previousOutput = await readPreviousOutput()
   const previousGroups = new Map(
@@ -186,22 +232,7 @@ async function main() {
       .filter((group) => group?.ok && typeof group.group_id === 'string')
       .map((group) => [group.group_id, group]),
   )
-  const groups = []
-
-  for (const groupId of GROUP_IDS) {
-    try {
-      groups.push(await fetchGroup(groupId))
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown error'
-      const previousGroup = previousGroups.get(groupId)
-
-      groups.push(previousGroup
-        ? { ...previousGroup, stale: true, error: message }
-        : { ok: false, group_id: groupId, error: message })
-    }
-
-    await sleep(REQUEST_DELAY_MS)
-  }
+  const groups = await fetchGroupsInBatches(GROUP_IDS, previousGroups)
 
   groups.sort(compareGroups)
   groups.forEach((group) => {
@@ -270,4 +301,4 @@ if (isMainModule) {
   await main()
 }
 
-export { createApiSources, isJoinable, normalizeGroup }
+export { createApiSources, fetchGroupsInBatches, isJoinable, normalizeGroup }

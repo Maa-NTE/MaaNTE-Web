@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { createApiSources, isJoinable, normalizeGroup } from './update-qq-group.mjs'
+import { createApiSources, fetchGroupsInBatches, isJoinable, normalizeGroup } from './update-qq-group.mjs'
 
 test('uses the live public API by default', () => {
   const sources = createApiSources({})
@@ -22,6 +22,34 @@ test('keeps a configured self-hosted API ahead of the public fallback', () => {
   assert.equal(sources[0].queryParam, 'id')
   assert.equal(sources[0].ckey, 'secret')
   assert.equal(sources[1].baseUrl, 'https://uapis.cn/api/v1/social/qq/groupinfo')
+})
+
+test('fetches three groups at a time with one delay between two batches', async () => {
+  const events = []
+  const groupIds = ['1', '2', '3', '4', '5', '6']
+
+  const groups = await fetchGroupsInBatches(groupIds, new Map(), {
+    batchSize: 3,
+    batchDelayMs: 60_000,
+    fetchGroupFn: async (groupId) => {
+      events.push(`fetch:${groupId}`)
+      return { ok: true, group_id: groupId, member_count: Number(groupId) }
+    },
+    sleepFn: async (delayMs) => {
+      events.push(`sleep:${delayMs}`)
+    },
+  })
+
+  assert.deepEqual(events, [
+    'fetch:1',
+    'fetch:2',
+    'fetch:3',
+    'sleep:60000',
+    'fetch:4',
+    'fetch:5',
+    'fetch:6',
+  ])
+  assert.deepEqual(groups.map((group) => group.group_id), groupIds)
 })
 
 test('normalizes a valid full group without marking it joinable', () => {
