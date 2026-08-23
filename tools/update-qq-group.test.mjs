@@ -40,6 +40,14 @@ test('parses JSON wrapped by the Jina reader', () => {
     group_id: '1',
     member_count: 2,
   })
+
+  assert.deepEqual(parseJinaJson(JSON.stringify({
+    code: 200,
+    data: { content: '{"group_id":"2","member_count":3}' },
+  })), {
+    group_id: '2',
+    member_count: 3,
+  })
 })
 
 test('fetches three groups at a time with one delay between two batches', async () => {

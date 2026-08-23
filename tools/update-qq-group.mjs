@@ -130,6 +130,19 @@ async function readJsonResponse(response, source = {}) {
 }
 
 function parseJinaJson(body) {
+  try {
+    const parsed = JSON.parse(body)
+    if (typeof parsed?.data?.content === 'string') {
+      return parseJinaJson(parsed.data.content)
+    }
+    if (typeof parsed?.content === 'string') {
+      return parseJinaJson(parsed.content)
+    }
+    return parsed
+  } catch {
+    // Fall through to the plain-text reader format below.
+  }
+
   const marker = 'Markdown Content:'
   const markerIndex = body.indexOf(marker)
   const json = markerIndex >= 0 ? body.slice(markerIndex + marker.length).trim() : body.trim()
